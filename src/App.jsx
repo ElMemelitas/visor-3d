@@ -51,23 +51,26 @@ function Camera() {
   };
 
   const takePhoto = () => {
-      if (!stream) return;
+    if (!stream) return;
 
-      const video = document.createElement('video');
-      video.srcObject = stream;
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.play();
 
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
+    video.onloadedmetadata = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
 
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const dataUrl = canvas.toDataURL('image/jpeg');
-      setPhoto(dataUrl);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        setPhoto(dataUrl);
+        sendPhotoToApi(dataUrl);
+    };
+};
 
-      sendPhotoToApi(dataUrl);
-  };
 
   const sendPhotoToApi = async (dataUrl) => {
       try {
